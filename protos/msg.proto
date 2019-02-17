@@ -1,0 +1,15 @@
+// protobuf definition for x
+
+syntax = "proto3";
+
+package confbase.schema;
+
+service Schema {
+    rpc SendMessage (Msg) returns (Response) {}
+}
+
+message Msg {
+}
+
+message Response {
+}
