@@ -1,6 +1,9 @@
 package jsonsch
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 type Type string
 
@@ -61,13 +64,7 @@ func NewArray(items interface{}) ArraySchema {
 	return ArraySchema{Type: Array, Items: items}
 }
 
-func TodoRenameThisFunctionLmao(data []interface{}, params *FromExampleParams) (ArraySchema, error) {
-	// TODO: incoporate entire array depending on mode
-	// E.g.,
-	// - use the first element to infer array type
-	// - use conjuction of all elements to infer array type
-	// - verify all elements are same type, otherwise fail
-
+func InferArrayTypeFromElem(data []interface{}, params *FromExampleParams) (ArraySchema, error) {
 	var elem interface{}
 
 	if len(data) == 0 {
@@ -90,6 +87,11 @@ func TodoRenameThisFunctionLmao(data []interface{}, params *FromExampleParams) (
 		}
 	} else {
 		elem = data[0]
+		for _, checkElem := range data {
+			if reflect.TypeOf(checkElem) != reflect.TypeOf(elem) {
+				return ArraySchema{}, fmt.Errorf("mismatched types %T, %T", elem, checkElem)
+			}
+		}
 	}
 
 	a := ArraySchema{Type: Array}
