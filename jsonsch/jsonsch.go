@@ -3,7 +3,7 @@ package jsonsch
 import (
 	"fmt"
 	"strings"
-
+	"reflect"
 	"github.com/Confbase/schema/graphqlsch"
 )
 
@@ -131,7 +131,6 @@ func handleArraySchema(params handleArraySchemaParams) ([]graphqlsch.Field, []gr
 		f.ArrayDim++
 	}
 
-	// TODO: ensure all items in array are same type
 	switch value := item.(type) {
 	case Primitive:
 		switch value.Type {
@@ -146,6 +145,12 @@ func handleArraySchema(params handleArraySchemaParams) ([]graphqlsch.Field, []gr
 		default:
 			return nil, nil, fmt.Errorf("array (key '%v') has unexpected type '%v'", params.Key, value.Type)
 		}
+	// ensure all items in array are same type
+	for _, checkElem := range item.([] interface{}) {
+		if reflect.TypeOf(item) != reflect.TypeOf(checkElem) {
+			return nil, nil, fmt.Errorf("mismatched types %T, %T", item, checkElem)
+		}
+	}
 	case Schema:
 		_, newTypes, err := handleSchema(handleSchemaParams{
 			Key:         params.Key,
